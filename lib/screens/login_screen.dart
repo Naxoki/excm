@@ -12,7 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final UserService _userService = UserService();
+  final UserService _userService = UserService(); // Singleton
 
   void _login() {
     if (_formKey.currentState!.validate()) {
@@ -64,11 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(labelText: "Contraseña"),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Campo requerido';
-                  return null;
-                },
+                validator: (value) =>
+                    value == null || value.isEmpty ? "Campo requerido" : null,
               ),
               SizedBox(height: 20),
               ElevatedButton(

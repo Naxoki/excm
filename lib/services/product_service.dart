@@ -1,21 +1,54 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/product.dart';
+import 'api_service.dart';
 
 class ProductService {
-  final String _baseUrl = "http://143.198.118.203:8100";
+  final ApiService _api = ApiService();
 
   Future<List<Product>> getProducts() async {
-    final uri = Uri.parse("$_baseUrl/ejemplos/product_list_rest/");
-    final response = await http.get(uri, headers: {
-      "Authorization": "Basic ${base64Encode(utf8.encode('test:test2023'))}"
-    });
+    final response = await _api.get("ejemplos/product_list_rest/");
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Product.fromJson(json)).toList();
+      final Map<String, dynamic> json = jsonDecode(response.body);
+
+      final List<dynamic> data = json["Listado"];
+
+      return data.map((item) => Product.fromJson(item)).toList();
     } else {
-      throw Exception("Error al cargar productos");
+      throw Exception("Error al obtener productos");
     }
+  }
+
+
+  Future<bool> addProduct(String name, double price, String imageUrl) async {
+    final response = await _api.post("ejemplos/product_add_rest/", {
+      "product_name": name,
+      "product_price": price,
+      "product_image": imageUrl,
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> editProduct({
+    required int id,
+    required String name,
+    required double price,
+    required String imageUrl,
+  }) async {
+    final response = await _api.post("ejemplos/product_edit_rest/", {
+      "product_id": id,
+      "product_name": name,
+      "product_price": price,
+      "product_image": imageUrl,
+      "product_state": "Activo"
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteProduct(int id) async {
+    final response = await _api.post("ejemplos/product_del_rest/", {
+      "product_id": id,
+    });
+    return response.statusCode == 200;
   }
 }

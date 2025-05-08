@@ -10,7 +10,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final UserService _userService = UserService();
+  final UserService _userService = UserService(); // Singleton
 
   void _register() {
     if (_formKey.currentState!.validate()) {
@@ -21,9 +21,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (result == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registro exitoso, puedes iniciar sesión")),
+          SnackBar(content: Text("Registro exitoso. Inicia sesión.")),
         );
-        Navigator.pop(context); // volver a login
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result)),
