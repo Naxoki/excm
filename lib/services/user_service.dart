@@ -1,53 +1,40 @@
-import '../models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserService {
-  // Singleton
-  static final UserService _instance = UserService._internal();
-  factory UserService() => _instance;
-  UserService._internal();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final List<User> _registeredUsers = [];
-  User? _currentUser;
-
-  // Registrar usuario
-  String? register(String email, String password) {
-    final userExists = _registeredUsers.any((user) => user.email == email);
-    if (userExists) {
-      return 'El email ya está registrado';
+  // 🔹 Registrar usuario
+  Future<String?> register(String email, String password) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      return null; // éxito
+    } on FirebaseAuthException catch (e) {
+      return e.message; // error
     }
-    _registeredUsers.add(User(email: email, password: password));
-    return null;
   }
 
-  // Login
-  String? login(String email, String password) {
-    final user = _registeredUsers.firstWhere(
-      (user) => user.email == email && user.password == password,
-      orElse: () => User(email: '', password: ''),
-    );
-    if (user.email.isEmpty) {
-      return 'Usuario o contraseña incorrectos';
+  // 🔹 Iniciar sesión
+  Future<String?> login(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null; // éxito
+    } on FirebaseAuthException catch (e) {
+      return e.message;
     }
-    _currentUser = user;
-    return null;
   }
 
-  // Obtener usuario actual
-  Future<User?> getCurrentUser() async => _currentUser;
-
-  // Logout
+  // 🔹 Cerrar sesión
   Future<void> logout() async {
-    _currentUser = null;
+    await _auth.signOut();
   }
 
-  // Agregar un producto al usuario actual
-  void addProductToCurrentUser(String product) {
-    if (_currentUser != null) {
-      _currentUser = User(
-        email: _currentUser!.email,
-        password: _currentUser!.password,
-        products: [..._currentUser!.products, product],
-      );
-    }
+  // 🔹 Obtener usuario actual
+  User? getCurrentUser() {
+    return _auth.currentUser;
+  }
+
+  // 🔹 Saber si hay sesión activa
+  bool isLoggedIn() {
+    return _auth.currentUser != null;
   }
 }

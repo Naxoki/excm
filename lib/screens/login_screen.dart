@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
-import 'home_screen.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -12,33 +10,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final UserService _userService = UserService(); // Singleton
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
+  final UserService _userService = UserService();
 
-      final result = _userService.login(email, password);
+  bool _loading = false;
 
-      if (result == null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result)),
-        );
-      }
+  void _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    final result = await _userService.login(email, password);
+
+    setState(() => _loading = false);
+
+    if (result == null) {
+      // Login exitoso
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      // Error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
     }
-  }
-
-  void _goToRegister() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RegisterScreen()),
-    );
   }
 
   @override
@@ -46,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Iniciar sesión")),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -55,27 +52,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _emailController,
                 decoration: InputDecoration(labelText: "Correo electrónico"),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Campo requerido';
-                  if (!value.contains('@')) return 'Correo inválido';
+                  if (value == null || value.isEmpty) return 'Campo obligatorio';
+                  if (!value.contains('@')) return 'Correo no válido';
                   return null;
                 },
               ),
               TextFormField(
                 controller: _passwordController,
-                obscureText: true,
                 decoration: InputDecoration(labelText: "Contraseña"),
+                obscureText: true,
                 validator: (value) =>
-                    value == null || value.isEmpty ? "Campo requerido" : null,
+                    value == null || value.length < 6 ? 'Mínimo 6 caracteres' : null,
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text("Iniciar sesión"),
-              ),
+              _loading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _login,
+                      child: Text("Iniciar sesión"),
+                    ),
               TextButton(
-                onPressed: _goToRegister,
+                onPressed: () => Navigator.pushNamed(context, '/register'),
                 child: Text("¿No tienes cuenta? Regístrate"),
-              )
+              ),
             ],
           ),
         ),

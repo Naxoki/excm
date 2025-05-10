@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "98586432516",
+    "project_id": "authuser-5382d",
+    "storage_bucket": "authuser-5382d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98586432516:android:61d1813ff41e446f489151",
+        "android_client_info": {
+          "package_name": "com.example.excm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQlJyYwdjxSAqTcyAqAxP30lYMvxEGEe8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

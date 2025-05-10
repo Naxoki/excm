@@ -1,52 +1,43 @@
 import 'package:flutter/material.dart';
-import 'products/product_list_screen.dart';
-import 'providers/provider_list_screen.dart';
-import 'categories/category_list_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/user_service.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
-
-  final List<Widget> _screens = [
-    ProductListScreen(),
-    ProviderListScreen(),
-    CategoryListScreen(),
-  ];
-
-  final List<String> _titles = [
-    "Productos",
-    "Proveedores",
-    "Categorías",
-  ];
+class HomeScreen extends StatelessWidget {
+  final UserService _userService = UserService();
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'Productos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Proveedores',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categorías',
-          ),
+        title: Text("Inicio"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              await _userService.logout();
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          )
         ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "¡Bienvenido!",
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 12),
+            Text(
+              user != null ? "Usuario: ${user.email}" : "No hay usuario",
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/products/product_form_screen.dart';
 import 'screens/providers/provider_form_screen.dart';
 import 'screens/categories/category_form_screen.dart';
+import 'screens/categories/category_list_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -14,11 +23,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Gestión App',
+      title: 'Excm App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: '/',
       routes: {
@@ -28,8 +36,7 @@ class MyApp extends StatelessWidget {
         '/product-form': (context) => ProductFormScreen(),
         '/provider-form': (context) => ProviderFormScreen(),
         '/category-form': (context) => CategoryFormScreen(),
-
-        // Puedes agregar más rutas aquí como: '/provider-edit': ...
+        '/category-list': (context) => CategoryListScreen(),
       },
     );
   }
